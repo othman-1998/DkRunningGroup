@@ -12,8 +12,8 @@ namespace webapp.ViewModels
         public Address Address { get; set; } = new Address();
         public IFormFile? Image { get; set; }
         public ClubCategory ClubCategory { get; set; }
+        public string? AppUserId { get; set; }
 
-
-	}
+    }
 }
 

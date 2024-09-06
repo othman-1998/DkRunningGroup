@@ -17,12 +17,13 @@ namespace webapp.Controllers
     {
         private readonly IClubRepository _clubRepository;
         private readonly iPhotoService _photoService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-
-        public ClubController(IClubRepository clubRepository, iPhotoService photoService)
+        public ClubController(IClubRepository clubRepository, iPhotoService photoService, IHttpContextAccessor httpContextAccessor)
         {
             _clubRepository = clubRepository;
             _photoService = photoService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // this is our controller
@@ -44,9 +45,13 @@ namespace webapp.Controllers
 
         }
 
+        edededede
+
         public IActionResult Create()
         {
-            return View();
+            var currentUserId = _httpContextAccessor.HttpContext.User.GetUserId();
+            var createClubViewModel = new CreateClubViewModel { AppUserId = currentUserId };
+            return View(createClubViewModel);
         }
 
         [HttpPost]
