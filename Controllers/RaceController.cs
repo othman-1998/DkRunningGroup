@@ -19,12 +19,13 @@ namespace webapp.Controllers
     {
         private readonly IRaceRepository _raceRepository;
         private readonly iPhotoService _photoService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public RaceController(IRaceRepository raceRepository, iPhotoService photoService)
+        public RaceController(IRaceRepository raceRepository, iPhotoService photoService, IHttpContextAccessor httpContextAccessor)
         {
             _raceRepository = raceRepository;
             _photoService = photoService;
-
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: /<controller>/
@@ -46,26 +47,28 @@ namespace webapp.Controllers
 
         public IActionResult Create()
         {
-            return View();
+            var currentUserId = _httpContextAccessor.HttpContext?.User.GetUserId();
+            var createRaceViewModel = new CreateRaceViewModel { AppUserId = currentUserId };
+            return View(createRaceViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateRaceViewModel raceVm)
+        public async Task<IActionResult> Create(CreateRaceViewModel raceVM)
         {
             if (ModelState.IsValid)
             {
-                var result = await _photoService.AddPhotoAsync(raceVm.Image);
+                var result = await _photoService.AddPhotoAsync(raceVM.Image);
 
                 var race = new Race
                 {
-                    Title = raceVm.Title,
-                    Description = raceVm.Description,
+                    Title = raceVM.Title,
+                    Description = raceVM.Description,
                     Image = result.Url.ToString(),
                     Address = new Address
                     {
-                        City = raceVm.Address.City,
-                        Street = raceVm.Address.Street,
-                        State = raceVm.Address.State
+                        City = raceVM.Address.City,
+                        Street = raceVM.Address.Street,
+                        State = raceVM.Address.State
                     }
                 };
                 _raceRepository.Add(race);
@@ -76,7 +79,7 @@ namespace webapp.Controllers
                 ModelState.AddModelError("", "Photo upload failed");
             }
 
-            return View(raceVm);
+            return View(raceVM);
 
         }
 
@@ -100,12 +103,12 @@ namespace webapp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, EditRaceViewModel raceVm)
+        public async Task<IActionResult> Edit(int id, EditRaceViewModel raceVM)
         {
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError("", "Failed to edit race");
-                return View("Edit", raceVm);
+                return View("Edit", raceVM);
             }
 
             var userClub = await _raceRepository.GetByIdAsyncNoTracking(id);
@@ -121,19 +124,19 @@ namespace webapp.Controllers
                 catch (Exception ex)
                 {
                     ModelState.AddModelError("", "Could not delete photo");
-                    return View(raceVm);
+                    return View(raceVM);
                 }
 
-                var photoResult = await _photoService.AddPhotoAsync(raceVm.Image);
+                var photoResult = await _photoService.AddPhotoAsync(raceVM.Image);
 
                 var race = new Race
                 {
                     Id = id,
-                    Title = raceVm.Title,
-                    Description = raceVm.Description,
+                    Title = raceVM.Title,
+                    Description = raceVM.Description,
                     Image = photoResult.Url.ToString(),
-                    AddressId = raceVm.AddressId,
-                    Address = raceVm.Address
+                    AddressId = raceVM.AddressId,
+                    Address = raceVM.Address
                 };
 
                 _raceRepository.Update(race);
@@ -142,7 +145,7 @@ namespace webapp.Controllers
             }
             else
             {
-                return View(raceVm);
+                return View(raceVM);
             }
         }
 

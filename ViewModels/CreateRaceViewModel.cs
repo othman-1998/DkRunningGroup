@@ -13,7 +13,7 @@ namespace webapp.ViewModels
         public Address Address { get; set; } = new Address();
         public IFormFile? Image { get; set; }
         public RaceCategory RaceCategory { get; set; }
-
+        public string? AppUserId { get; set; }
 
     }
 }

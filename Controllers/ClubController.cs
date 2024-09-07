@@ -45,32 +45,31 @@ namespace webapp.Controllers
 
         }
 
-        edededede
-
         public IActionResult Create()
         {
-            var currentUserId = _httpContextAccessor.HttpContext.User.GetUserId();
+            var currentUserId = _httpContextAccessor.HttpContext?.User.GetUserId();
             var createClubViewModel = new CreateClubViewModel { AppUserId = currentUserId };
             return View(createClubViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateClubViewModel clubVm)
+        public async Task<IActionResult> Create(CreateClubViewModel clubVM)
         {
             if(ModelState.IsValid)
             {
-                var result = await _photoService.AddPhotoAsync(clubVm.Image);
+                var result = await _photoService.AddPhotoAsync(clubVM.Image);
 
                     var club = new Club
                     {
-                        Title = clubVm.Title,
-                        Description = clubVm.Description,
+                        Title = clubVM.Title,
+                        Description = clubVM.Description,
                         Image = result.Url.ToString(),
+                        AppUserId = clubVM.AppUserId,
                         Address = new Address
                         {
-                            City = clubVm.Address.City,
-                            Street = clubVm.Address.Street,
-                            State = clubVm.Address.State
+                            City = clubVM.Address.City,
+                            Street = clubVM.Address.Street,
+                            State = clubVM.Address.State
                         }
                     };
                     _clubRepository.Add(club);
@@ -80,7 +79,7 @@ namespace webapp.Controllers
                 ModelState.AddModelError("", "Photo upload failed");
             }
 
-            return View(clubVm);
+            return View(clubVM);
 
         }
 
@@ -91,7 +90,7 @@ namespace webapp.Controllers
 
             if (club == null) return View("Error");
 
-            var clubVm = new EditClubViewModel
+            var clubVM = new EditClubViewModel
             {
                 Title = club.Title,
                 Description = club.Description,
@@ -101,16 +100,16 @@ namespace webapp.Controllers
                 ClubCategory = club.ClubCategory
             };
 
-            return View(clubVm);
+            return View(clubVM);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, EditClubViewModel clubVm)
+        public async Task<IActionResult> Edit(int id, EditClubViewModel clubVM)
         {
             if(!ModelState.IsValid)
             {
                 ModelState.AddModelError("", "Failed to edit club");
-                return View("Edit", clubVm);
+                return View("Edit", clubVM);
             }
 
             var userClub = await _clubRepository.GetByIdAsyncNoTracking(id);
@@ -126,19 +125,19 @@ namespace webapp.Controllers
                 catch (Exception ex)
                 {
                     ModelState.AddModelError("", "Could not delete photo");
-                    return View(clubVm);
+                    return View(clubVM);
                 }
 
-                var photoResult = await _photoService.AddPhotoAsync(clubVm.Image);
+                var photoResult = await _photoService.AddPhotoAsync(clubVM.Image);
 
                 var club = new Club
                 {
                     Id = id,
-                    Title = clubVm.Title,
-                    Description = clubVm.Description,
+                    Title = clubVM.Title,
+                    Description = clubVM.Description,
                     Image = photoResult.Url.ToString(),
-                    AddressId = clubVm.AddressId,
-                    Address = clubVm.Address
+                    AddressId = clubVM.AddressId,
+                    Address = clubVM.Address
                 };
 
                 _clubRepository.Update(club);
@@ -147,7 +146,7 @@ namespace webapp.Controllers
             }
             else
             {
-                return View(clubVm);
+                return View(clubVM);
             }
         }
 
