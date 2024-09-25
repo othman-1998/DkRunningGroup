@@ -64,6 +64,7 @@ namespace webapp.Controllers
                     Title = raceVM.Title,
                     Description = raceVM.Description,
                     Image = result.Url.ToString(),
+                    AppUserId = raceVM.AppUserId,
                     Address = new Address
                     {
                         City = raceVM.Address.City,
