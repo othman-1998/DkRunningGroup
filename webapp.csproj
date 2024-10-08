@@ -20,6 +20,7 @@
     <None Remove="ViewModels\" />
     <None Remove="Views\Account\" />
     <None Remove="Views\Dashboard\" />
+    <None Remove="Views\Users\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
@@ -33,6 +34,7 @@
     <Folder Include="ViewModels\" />
     <Folder Include="Views\Account\" />
     <Folder Include="Views\Dashboard\" />
+    <Folder Include="Views\Users\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
